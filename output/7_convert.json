@@ -1,0 +1,173 @@
+{
+  "AbsorptionAmount": 0.0,
+  "ArmorDropChances": [
+    0.0,
+    2.0,
+    0.0,
+    0.0
+  ],
+  "ArmorItems": [
+    {
+      "id": "minecraft:netherite_boots",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:feather_falling": 4,
+            "minecraft:fire_protection": 3,
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "components": {
+        "apotheosis:affixes": {
+          "护甲百分比": 0.321083515,
+          "apotheosis:armor/attribute/fortunate": 0.77807117,
+          "护甲值": 8.0,
+          "apotheosis:armor/attribute/windswept": 0.87093425,
+          "物理减伤": 0.12874142,
+          "抗性提升": 1.0,
+          "apotheosis:armor/mob_effect/nimble": 0.6448133
+        },
+        "apotheosis:durability_bonus": 0.5971505,
+        "apotheosis:from_boss": true,
+        "apotheosis:rarity": "apotheosis:mythic",
+        "apotheosis:sockets": 2,
+        "minecraft:custom_name": {
+          "extra": [
+            "Schynbalds"
+          ],
+          "italic": false,
+          "text": "Fiery "
+        },
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:fire_protection": 5,
+            "minecraft:protection": 7
+          }
+        }
+      },
+      "count": 1,
+      "id": "minecraft:netherite_leggings"
+    },
+    {
+      "id": "minecraft:netherite_chestplate",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_helmet",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6
+          }
+        }
+      }
+    }
+  ],
+  "CustomName": {
+    "text": "",
+    "extra": "&#F0F6CAC&#EBE0C2h&#E6CABAi&#E1B3B2c&#DC9DAAo&#D787A3C&#D2719Bh&#CD5A93a&#C8448Br&#C32E83a"
+  },
+  "HandDropChances": [
+    0.0,
+    0.0
+  ],
+  "HandItems": [
+    {
+      "id": "minecraft:netherite_shovel",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:fortune": 15,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:shield",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "apothic_enchanting:reflective_defenses": 2,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    }
+  ],
+  "Health": 1000000.0,
+  "UUID": [
+    -123690246,
+    -747682329,
+    -2068653615,
+    -1258705987
+  ],
+  "active_effects": [
+    {
+      "ambient": true,
+      "amplifier": true,
+      "duration": 2147271438,
+      "id": "minecraft:fire_resistance",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    }
+  ],
+  "attributes": [
+    {
+      "id": "minecraft:generic.attack_damage",
+      "total_amount": 37898200522.12968
+    },
+    {
+      "id": "apothic_attributes:prot_shred",
+      "total_amount": 439.9521849818454
+    },
+    {
+      "id": "minecraft:generic.movement_speed",
+      "total_amount": 0.471240006845891
+    },
+    {
+      "id": "apothic_attributes:prot_pierce",
+      "total_amount": 20.0
+    },
+    {
+      "id": "minecraft:generic.armor",
+      "total_amount": 385857.1977852046
+    },
+    {
+      "id": "apothic_attributes:armor_shred",
+      "total_amount": 879.9043699636908
+    },
+    {
+      "id": "apothic_attributes:projectile_damage",
+      "total_amount": 4909093465.2977295
+    },
+    {
+      "id": "minecraft:generic.armor_toughness",
+      "total_amount": 768.7452291872729
+    },
+    {
+      "id": "apothic_attributes:armor_pierce",
+      "total_amount": 25.0
+    },
+    {
+      "id": "minecraft:generic.max_health",
+      "total_amount": 857225876940.1066
+    }
+  ],
+  "id": "minecraft:wolf",
+  "variant": "minecraft:pale"
+}

@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大狗 to JSON 转换器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 1400px;
+            max-height: 2000px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+        .upload-area:hover {
+            background: #eef0ff;
+            border-color: #764ba2;
+        }
+        .upload-area.dragover {
+            background: #e0e4ff;
+            border-color: #764ba2;
+        }
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .upload-text {
+            color: #666;
+            font-size: 16px;
+        }
+        .file-input {
+            display: none;
+        }
+        .file-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .file-name {
+            color: #333;
+            font-size: 14px;
+        }
+        .file-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            width: 0%;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 14px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        .divider span {
+            padding: 0 15px;
+        }
+        .text-area-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .text-input-wrapper, .text-output-wrapper {
+            flex: 1;
+        }
+        .text-input-wrapper label, .text-output-wrapper label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        .text-input, .text-output {
+            width: 100%;
+            min-height: 450px;
+            min-width: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            resize: vertical;
+            transition: border-color 0.3s;
+            background: #f8f9ff;
+        }
+        .text-input:focus, .text-output:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .text-input::placeholder {
+            color: #aaa;
+        }
+        .text-output {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .btn-convert-text {
+            margin-top: 15px;
+            width: 100%;
+        }
+        .btn-save {
+            margin-top: 10px;
+            width: 100%;
+            background: #28a745;
+            color: white;
+        }
+        .btn-save:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+        }
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .main-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+        }
+        .left-panel {
+            flex: 0 0 350px;
+            padding-right: 15px;
+            border-right: 2px solid #e0e0e0;
+        }
+        .right-panel {
+            flex: 1;
+            padding-left: 15px;
+            min-width: 600px;
+        }
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>大狗 to JSON 转换器</h1>
+        <p class="subtitle">上传 .txt 文件或粘贴文本，自动转换为格式化的 JSON (安装tweakerge后f3+I复制物品数据)</p>
+        
+        <div class="main-container">
+            <div class="left-panel">
+                <div class="panel-title">批量文件转换</div>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">点击或拖拽上传 .txt 文件</div>
+                    <input type="file" class="file-input" id="fileInput" accept=".txt" multiple>
+                </div>
+                
+                <div class="file-list" id="fileList"></div>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-primary" id="convertBtn" disabled>批量转换</button>
+                    <button class="btn btn-secondary" id="downloadAllBtn" disabled>下载全部</button>
+                </div>
+                
+                <div class="stats" id="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="successCount">0</div>
+                        <div class="stat-label">成功</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="skipCount">0</div>
+                        <div class="stat-label">跳过</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="errorCount">0</div>
+                        <div class="stat-label">错误</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="panel-title">单文本转换</div>
+                <div class="text-area-container">
+                    <div class="text-input-wrapper">
+                        <label>输入文本</label>
+                        <textarea class="text-input" id="textInput" placeholder="在此粘贴包含 entity_data 的文本..."></textarea>
+                        <button class="btn btn-primary btn-convert-text" id="convertTextBtn">转换</button>
+                    </div>
+                    <div class="text-output-wrapper">
+                        <label>转换结果</label>
+                        <textarea class="text-output" id="textOutput" readonly placeholder="转换后的 JSON 将显示在这里..."></textarea>
+                        <button class="btn btn-save" id="saveBtn" disabled>保存为 JSON 文件</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //配置
+        const EXCLUDE_IDS = [
+            "minecraft:generic.knockback_resistance",
+            "minecraft:generic.scale",
+            "apothic_attributes:healing_received",
+            "minecraft:generic.burning_time",
+            "minecraft:generic.oxygen_bonus",
+            "minecraft:generic.follow_range",
+        ];
+
+        const KEY_TRANSLATION = {
+            "apotheosis:armor/dmg_reduction/blockading":"物理减伤",
+            "apotheosis:armor/dmg_reduction/runed":"魔法减伤",
+            "apotheosis:armor/dmg_reduction/blast_forged":"爆炸减伤",
+            "apotheosis:armor/dmg_reduction/deflective":"弹射物减伤",
+            "apotheosis:armor/attribute/blessed":"生命值",
+            "apotheosis:armor/attribute/ironforged":"护甲值",
+            "apotheosis:armor/attribute/adamantine":"护甲百分比",
+            "apotheosis:armor/attribute/steel_touched":"韧性值",
+            "apotheosis:generic/attribute/lucky":"大幸运值",
+            "apotheosis:generic/attribute/fortunate":"小幸运值",
+            "apotheosis:armor/attribute/stalwart":"击退抗性",
+            "apotheosis:armor/mob_effect/bolstering":"抗性提升",
+            "apotheosis:melee/attribute/graceful":"攻速",
+            "apotheosis:melee/attribute/vampiric":"吸血",
+            "apotheosis:melee/attribute/berserking":"过量治疗",
+            "apotheosis:melee/attribute/giant_slaying":"生命值伤害",
+            "apotheosis:melee/attribute/violent":"伤害值",
+            "apotheosis:melee/attribute/murderous":"伤害百分比",
+            "apotheosis:melee/attribute/infernal":"火伤",
+            "apotheosis:melee/attribute/glacial":"冰伤",
+            "apotheosis:melee/attribute/forceful":"击退",
+            "apotheosis:melee/attribute/piercing":"盔甲穿透",
+            "apotheosis:melee/attribute/intricate":"暴率",
+            "apotheosis:melee/attribute/lacerating":"暴伤",
+            "apotheosis:melee/cleaving":"挥劈",
+            "apotheosis:melee/executing":"处刑",
+            "apotheosis:melee/thunderstruck":"雷鸣",
+            "apotheosis:melee/mob_effect/caustic":"腐蚀",
+            "apotheosis:melee/mob_effect/bloodletting":"放血",
+            "apotheosis:melee/mob_effect/festive":"节庆",
+            "apotheosis:melee/mob_effect/elusive":"灵巧",
+        };
+
+        const VALUE_RANGES = {
+            "apotheosis:armor/dmg_reduction/blockading": [0.05, 0.15],
+            "apotheosis:armor/dmg_reduction/runed": [0.05, 0.15],
+            "apotheosis:armor/dmg_reduction/blast_forged": [0.15, 0.35],
+            "apotheosis:armor/dmg_reduction/deflective": [0.15, 0.30],
+            "apotheosis:armor/attribute/blessed":[5,8],
+            "apotheosis:armor/attribute/ironforged":[4,8],
+            "apotheosis:armor/attribute/adamantine":[0.25,0.4],
+            "apotheosis:armor/attribute/steel_touched":[2,6],
+            "apotheosis:generic/attribute/lucky":[3,6],
+            "apotheosis:generic/attribute/fortunate":[3,5],
+            "apotheosis:armor/attribute/stalwart":[0.25,0.35],
+            "apotheosis:melee/attribute/vampiric":[0.10,0.15],
+            "apotheosis:melee/attribute/berserking":[0.15,0.25],
+            "apotheosis:melee/attribute/giant_slaying":[0.10,0.25],
+            "apotheosis:melee/attribute/violent":[5,8],
+            "apotheosis:melee/attribute/murderous":[0.25,0.55],
+            "apotheosis:melee/attribute/infernal":[4,10],
+            "apotheosis:melee/attribute/glacial":[4,10],
+            "apotheosis:melee/attribute/intricate":[0.25,0.55],
+            "apotheosis:melee/attribute/lacerating":[0.25,0.40],
+            "apotheosis:melee/cleaving":[0.4,0.6],
+            "apotheosis:melee/executing":[0.15,0.25],
+            "apotheosis:melee/thunderstruck":[4,8],
+            "apotheosis:melee/mob_effect/festive":[0.03,0.06],
+        };
+
+        const REMOVE_KEYS = [
+            "Age",
+            "Air",
+            "AngerTime",
+            "AngryAt",
+            "Brain",
+            "CanPickUpLoot",
+            "CollarColor",
+            "CustomNameVisible",
+            "DeathLootTable",
+            "DeathTime",
+            "FallDistance",
+            "FallFlying",
+            "Fire",
+            "ForcedAge",
+            "HurtTime",
+            "HurtByTimestamp",
+            "Invulnerable",
+            "LeftHanded",
+            "PersistenceRequired",
+            "InLove",
+            "Motion",
+            "NeoForgeData",
+            "OnGround",
+            "Owner",
+            "PortalCooldown",
+            "Pos",
+            "Rotation",
+            "Sitting",
+            "neoforge:attachments",
+            "supplementaries:slimed_data",
+            "twilightforest:last_damage_armor_time",
+            "twilightforest:slimy_soles_bounce_info",
+            "yes_steve_model:vehicle_model_id",
+            "apotheosis:affix_name",
+        ];
+
+        //NBT解析器
+        class NBTToJSONConverter {
+            constructor() {
+                this.pos = 0;
+                this.text = "";
+            }
+
+            extractEntityData(inputText) {
+                const match = inputText.match(/entity_data=\{/);
+                if (!match) throw new Error("未找到entity_data=标记");
+                
+                let braceCount = 0;
+                let inString = false;
+                let stringChar = null;
+                let escapeNext = false;
+                
+                const startIndex = match.index + match[0].length - 1; // 指向 { 的位置
+                
+                for (let i = startIndex; i < inputText.length; i++) {
+                    const char = inputText[i];
+                    
+                    if (escapeNext) {
+                        escapeNext = false;
+                        continue;
+                    }
+                    
+                    if (char === '\\') {
+                        escapeNext = true;
+                        continue;
+                    }
+                    
+                    if (inString) {
+                        if (char === stringChar) inString = false;
+                        continue;
+                    }
+                    
+                    if (char === '"' || char === "'") {
+                        inString = true;
+                        stringChar = char;
+                        continue;
+                    }
+                    
+                    if (char === '{') braceCount++;
+                    else if (char === '}') {
+                        braceCount--;
+                        if (braceCount === 0) {
+                            return inputText.substring(startIndex, i + 1);
+                        }
+                    }
+                }
+                
+                throw new Error("未找到匹配的右括号");
+            }
+
+            parseNBT(text) {
+                this.text = text;
+                this.pos = 0;
+                this.skipWhitespace();
+                return this.parseValue();
+            }
+
+            skipWhitespace() {
+                while (this.pos < this.text.length && ' \t\n\r'.includes(this.text[this.pos])) this.pos++;
+            }
+
+            parseValue() {
+                this.skipWhitespace();
+                if (this.pos >= this.text.length) return null;
+                const char = this.text[this.pos];
+                if (char === '{') return this.parseObject();
+                if (char === '[') return this.parseArray();
+                if (char === '"' || char === "'") return this.parseString();
+                return this.parseNumberOrBool();
+            }
+
+            parseObject() {
+                const result = {};
+                this.pos++;
+                this.skipWhitespace();
+                
+                while (this.pos < this.text.length && this.text[this.pos] !== '}') {
+                    if (this.text[this.pos] === ',') {
+                        this.pos++;
+                        this.skipWhitespace();
+                        continue;
+                    }
+                    const key = this.parseKey();
+                    this.skipWhitespace();
+                    if (this.pos < this.text.length && this.text[this.pos] === ':') this.pos++;
+                    this.skipWhitespace();
+                    const value = this.parseValue();
+                    result[key] = value;
+                    this.skipWhitespace();
+                }
+                
+                if (this.pos < this.text.length) this.pos++;
+                return result;
+            }
+
+            parseKey() {
+                this.skipWhitespace();
+                if (this.pos >= this.text.length) return "";
+                const char = this.text[this.pos];
+                if (char === '"' || char === "'") return this.parseString();
+                let key = "";
+                while (this.pos < this.text.length && !':,{}[] \t\n\r'.includes(this.text[this.pos])) {
+                    key += this.text[this.pos];
+                    this.pos++;
+                }
+                return key;
+            }
+
+            parseString() {
+                if (this.pos >= this.text.length) return "";
+                const quoteChar = this.text[this.pos];
+                this.pos++;
+                let result = "";
+                
+                while (this.pos < this.text.length && this.text[this.pos] !== quoteChar) {
+                    if (this.text[this.pos] === '\\' && this.pos + 1 < this.text.length) {
+                        this.pos++;
+                        const escapeChar = this.text[this.pos];
+                        if (escapeChar === 'n') result += '\n';
+                        else if (escapeChar === 't') result += '\t';
+                        else if (escapeChar === 'r') result += '\r';
+                        else if (escapeChar === '\\') result += '\\';
+                        else if (escapeChar === '"') result += '"';
+                        else if (escapeChar === "'") result += "'";
+                        else result += '\\' + escapeChar;
+                    } else {
+                        result += this.text[this.pos];
+                    }
+                    this.pos++;
+                }
+                
+                if (this.pos < this.text.length) this.pos++;
+                
+                if (result.trim().startsWith('{') || result.trim().startsWith('[')) {
+                    try { return JSON.parse(result); } catch (e) {}
+                }
+                
+                return result;
+            }
+
+            parseArray() {
+                this.pos++;
+                this.skipWhitespace();
+                if (this.pos >= this.text.length) return [];
+                
+                if (this.pos < this.text.length && 'IBLDF'.includes(this.text[this.pos])) {
+                    const arrayType = this.text[this.pos];
+                    this.pos++;
+                    if (this.pos < this.text.length && this.text[this.pos] === ';') {
+                        this.pos++;
+                        return this.parseTypedArray(arrayType);
+                    } else {
+                        this.pos--;
+                    }
+                }
+                
+                return this.parseNormalArray();
+            }
+
+            parseTypedArray(arrayType) {
+                const result = [];
+                this.skipWhitespace();
+                
+                while (this.pos < this.text.length && this.text[this.pos] !== ']') {
+                    if (this.text[this.pos] === ',') {
+                        this.pos++;
+                        this.skipWhitespace();
+                        continue;
+                    }
+                    let numStr = "";
+                    while (this.pos < this.text.length && !',] \t\n\r'.includes(this.text[this.pos])) {
+                        numStr += this.text[this.pos];
+                        this.pos++;
+                    }
+                    numStr = numStr.replace(/[bBdDfFlLsS]+$/, '');
+                    if (numStr) {
+                        try {
+                            result.push(numStr.includes('.') ? parseFloat(numStr) : parseInt(numStr));
+                        } catch (e) { result.push(numStr); }
+                    }
+                    this.skipWhitespace();
+                }
+                
+                if (this.pos < this.text.length) this.pos++;
+                return result;
+            }
+
+            parseNormalArray() {
+                const result = [];
+                this.skipWhitespace();
+                
+                while (this.pos < this.text.length && this.text[this.pos] !== ']') {
+                    if (this.text[this.pos] === ',') {
+                        this.pos++;
+                        this.skipWhitespace();
+                        continue;
+                    }
+                    const value = this.parseValue();
+                    if (value !== null) result.push(value);
+                    this.skipWhitespace();
+                }
+                
+                if (this.pos < this.text.length) this.pos++;
+                return result;
+            }
+
+            parseNumberOrBool() {
+                let numStr = "";
+                while (this.pos < this.text.length && !',{}[] \t\n\r'.includes(this.text[this.pos])) {
+                    numStr += this.text[this.pos];
+                    this.pos++;
+                }
+                
+                if (numStr.toLowerCase() === 'true' || numStr.toLowerCase() === '1b') return true;
+                if (numStr.toLowerCase() === 'false' || numStr.toLowerCase() === '0b') return false;
+                
+                const cleanNum = numStr.replace(/[bBdDfFlLsS]+$/, '');
+                if (!cleanNum) return numStr;
+                
+                try {
+                    return cleanNum.includes('.') ? parseFloat(cleanNum) : parseInt(cleanNum);
+                } catch (e) { return numStr; }
+            }
+        }
+
+        //处理函数
+        function calculateAttributeModifiers(data) {
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) {
+                    return data.map(calculateAttributeModifiers);
+                }
+                if ('modifiers' in data && Array.isArray(data.modifiers) && 'base' in data) {
+                    const base = data.base;
+                    let sumAddValue = 0, sumAddMultipliedBase = 0, productAddMultipliedTotal = 1;
+                    for (const mod of data.modifiers) {
+                        if (typeof mod === 'object' && mod !== null && 'operation' in mod && 'amount' in mod) {
+                            if (mod.operation === 'add_value') sumAddValue += mod.amount;
+                            else if (mod.operation === 'add_multiplied_base') sumAddMultipliedBase += mod.amount;
+                            else if (mod.operation === 'add_multiplied_total') productAddMultipliedTotal *= (1 + mod.amount);
+                        }
+                    }
+                    const totalAmount = ((base + sumAddValue) * (1 + sumAddMultipliedBase) * productAddMultipliedTotal);
+                    return { id: data.id, total_amount: totalAmount };
+                }
+                const result = {};
+                for (const [key, value] of Object.entries(data)) {
+                    result[key] = calculateAttributeModifiers(value);
+                }
+                return result;
+            }
+            return data;
+        }
+
+        function filterDropItems(data) {
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) return data.map(filterDropItems);
+                
+                if ('ArmorItems' in data && 'ArmorDropChances' in data) {
+                    const items = data.ArmorItems;
+                    const chances = data.ArmorDropChances;
+                    if (Array.isArray(items) && Array.isArray(chances)) {
+                        data.ArmorItems = items.map((item, i) => {
+                            const chance = i < chances.length ? chances[i] : 0.0;
+                            if (chance !== 0.0 && typeof item === 'object' && item !== null) return item;
+                            if (typeof item === 'object' && item !== null && 'id' in item) {
+                                const enchantments = ('components' in item && typeof item.components === 'object' && 'minecraft:enchantments' in item.components) ? item.components['minecraft:enchantments'] : {};
+                                return { id: item.id, components: { 'minecraft:enchantments': enchantments } };
+                            }
+                            return item;
+                        });
+                    }
+                }
+                
+                if ('HandItems' in data && 'HandDropChances' in data) {
+                    const items = data.HandItems;
+                    const chances = data.HandDropChances;
+                    if (Array.isArray(items) && Array.isArray(chances)) {
+                        data.HandItems = items.map((item, i) => {
+                            const chance = i < chances.length ? chances[i] : 0.0;
+                            if (chance !== 0.0 && typeof item === 'object' && item !== null) return item;
+                            if (typeof item === 'object' && item !== null && 'id' in item) {
+                                const enchantments = ('components' in item && typeof item.components === 'object' && 'minecraft:enchantments' in item.components) ? item.components['minecraft:enchantments'] : {};
+                                return { id: item.id, components: { 'minecraft:enchantments': enchantments } };
+                            }
+                            return item;
+                        });
+                    }
+                }
+                
+                for (const key in data) {
+                    if (data.hasOwnProperty(key)) data[key] = filterDropItems(data[key]);
+                }
+                return data;
+            }
+            return data;
+        }
+
+        function filterExcludedIds(data, excludeIds) {
+            if (!excludeIds || excludeIds.length === 0) return data;
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) {
+                    return data.map(item => filterExcludedIds(item, excludeIds)).filter(item => item !== null);
+                }
+                //只过滤attributes数组中的属性对象
+                if ('id' in data && 'total_amount' in data && excludeIds.includes(data.id)) return null;
+                const result = {};
+                for (const [key, value] of Object.entries(data)) {
+                    const filtered = filterExcludedIds(value, excludeIds);
+                    if (filtered !== null) result[key] = filtered;
+                }
+                return result;
+            }
+            return data;
+        }
+
+        function applyValueRanges(data, valueRanges, inAffixes = false) {
+            if (!valueRanges || Object.keys(valueRanges).length === 0) return data;
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) return data.map(item => applyValueRanges(item, valueRanges, inAffixes));
+                
+                if ('apotheosis:affixes' in data) {
+                    const result = {};
+                    for (const [key, value] of Object.entries(data)) {
+                        if (key === 'apotheosis:affixes') result[key] = applyValueRanges(value, valueRanges, true);
+                        else result[key] = applyValueRanges(value, valueRanges, false);
+                    }
+                    return result;
+                }
+                
+                if (inAffixes) {
+                    const result = {};
+                    for (const [key, value] of Object.entries(data)) {
+                        if (key in valueRanges && (typeof value === 'number')) {
+                            const [minVal, maxVal] = valueRanges[key];
+                            result[key] = minVal + (maxVal - minVal) * value;
+                        } else {
+                            result[key] = applyValueRanges(value, valueRanges, inAffixes);
+                        }
+                    }
+                    return result;
+                }
+                
+                const result = {};
+                for (const [key, value] of Object.entries(data)) {
+                    result[key] = applyValueRanges(value, valueRanges, inAffixes);
+                }
+                return result;
+            }
+            return data;
+        }
+
+        function translateKeys(data, translationTable) {
+            if (!translationTable || Object.keys(translationTable).length === 0) return data;
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) return data.map(item => translateKeys(item, translationTable));
+                const result = {};
+                for (const [key, value] of Object.entries(data)) {
+                    const newKey = translationTable[key] || key;
+                    result[newKey] = translateKeys(value, translationTable);
+                }
+                return result;
+            }
+            return data;
+        }
+
+        function removeKeys(data, keysToRemove) {
+            if (!keysToRemove || keysToRemove.length === 0) return data;
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) return data.map(item => removeKeys(item, keysToRemove));
+                const result = {};
+                for (const [key, value] of Object.entries(data)) {
+                    if (!keysToRemove.includes(key)) result[key] = removeKeys(value, keysToRemove);
+                }
+                return result;
+            }
+            return data;
+        }
+
+        function formatCustomName(data) {
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) return data.map(formatCustomName);
+                
+                if ('CustomName' in data && typeof data.CustomName === 'object' && data.CustomName !== null) {
+                    const customName = data.CustomName;
+                    if ('extra' in customName && Array.isArray(customName.extra)) {
+                        const parts = customName.extra.map(part => {
+                            if (typeof part === 'object' && part !== null) {
+                                let str = "";
+                                if (part.bold === true) str += "&l";
+                                if (part.italic === true) str += "&r";
+                                if ('color' in part && typeof part.color === 'string' && part.color.startsWith('#')) str += "&#" + part.color.substring(1);
+                                if ('text' in part) str += part.text;
+                                return str;
+                            }
+                            return typeof part === 'string' ? part : "";
+                        });
+                        customName.extra = parts.join('');
+                    } else if ('text' in customName) {
+                        let prefix = "";
+                        if (customName.bold === true) prefix += "&l";
+                        if (customName.italic === true) prefix += "&r";
+                        if ('color' in customName && typeof customName.color === 'string' && customName.color.startsWith('#')) prefix += "&#" + customName.color.substring(1);
+                        data.CustomName = prefix + customName.text;
+                    }
+                }
+                
+                for (const key in data) {
+                    if (data.hasOwnProperty(key)) data[key] = formatCustomName(data[key]);
+                }
+                return data;
+            }
+            return data;
+        }
+
+        function convertNBTToJSON(inputText) {
+            const converter = new NBTToJSONConverter();
+            const nbtText = converter.extractEntityData(inputText);
+            let data = converter.parseNBT(nbtText);
+            data = calculateAttributeModifiers(data);
+            data = filterDropItems(data);
+            data = filterExcludedIds(data, EXCLUDE_IDS);
+            //确保根对象不会被过滤为null
+            if (data === null) data = {};
+            data = applyValueRanges(data, VALUE_RANGES);
+            data = translateKeys(data, KEY_TRANSLATION);
+            data = removeKeys(data, REMOVE_KEYS);
+            data = formatCustomName(data);
+            return data;
+        }
+
+        //UI逻辑
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const convertBtn = document.getElementById('convertBtn');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const stats = document.getElementById('stats');
+
+        let files = [];
+        let convertedFiles = [];
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(newFiles) {
+            const txtFiles = Array.from(newFiles).filter(f => f.name.endsWith('.txt'));
+            files = [...files, ...txtFiles];
+            updateFileList();
+            convertBtn.disabled = files.length === 0;
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = files.map((file, i) => `
+                <div class="file-item">
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-status status-pending" id="status-${i}">待转换</span>
+                </div>
+            `).join('');
+        }
+
+        convertBtn.addEventListener('click', async () => {
+            convertBtn.disabled = true;
+            progressBar.style.display = 'block';
+            stats.style.display = 'flex';
+            convertedFiles = [];
+            
+            let success = 0, skip = 0, error = 0;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const statusEl = document.getElementById(`status-${i}`);
+                
+                try {
+                    const text = await file.text();
+                    if (!text.startsWith('/')) {
+                        statusEl.textContent = '跳过';
+                        statusEl.className = 'file-status status-pending';
+                        skip++;
+                        continue;
+                    }
+                    
+                    const data = convertNBTToJSON(text);
+                    const jsonStr = JSON.stringify(data, null, 2);
+                    const outputName = file.name.replace('.txt', '_convert.json');
+                    convertedFiles.push({ name: outputName, content: jsonStr });
+                    
+                    statusEl.textContent = '成功';
+                    statusEl.className = 'file-status status-success';
+                    success++;
+                } catch (e) {
+                    statusEl.textContent = '错误';
+                    statusEl.className = 'file-status status-error';
+                    error++;
+                }
+                
+                progressFill.style.width = `${((i + 1) / files.length) * 100}%`;
+            }
+            
+            document.getElementById('successCount').textContent = success;
+            document.getElementById('skipCount').textContent = skip;
+            document.getElementById('errorCount').textContent = error;
+            
+            downloadAllBtn.disabled = convertedFiles.length === 0;
+            convertBtn.disabled = false;
+        });
+
+        downloadAllBtn.addEventListener('click', () => {
+            convertedFiles.forEach(file => {
+                const blob = new Blob([file.content], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        });
+
+        //文本框转换功能
+        const textInput = document.getElementById('textInput');
+        const textOutput = document.getElementById('textOutput');
+        const convertTextBtn = document.getElementById('convertTextBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        let lastConvertedJson = '';
+
+        convertTextBtn.addEventListener('click', () => {
+            const text = textInput.value.trim();
+            if (!text) {
+                alert('请输入文本内容');
+                return;
+            }
+            
+            try {
+                const converter = new NBTToJSONConverter();
+                const nbtText = converter.extractEntityData(text);
+                
+                let data = converter.parseNBT(nbtText);
+                data = calculateAttributeModifiers(data);
+                data = filterDropItems(data);
+                data = filterExcludedIds(data, EXCLUDE_IDS);
+                
+                if (data === null) data = {};
+                
+                data = applyValueRanges(data, VALUE_RANGES);
+                data = translateKeys(data, KEY_TRANSLATION);
+                data = removeKeys(data, REMOVE_KEYS);
+                data = formatCustomName(data);
+                
+                lastConvertedJson = JSON.stringify(data, null, 2);
+                textOutput.value = lastConvertedJson;
+                saveBtn.disabled = false;
+            } catch (e) {
+                textOutput.value = '转换失败：' + e.message;
+                saveBtn.disabled = true;
+                lastConvertedJson = '';
+            }
+        });
+
+        //保存按钮功能
+        saveBtn.addEventListener('click', () => {
+            if (!lastConvertedJson) return;
+            
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const outputName = `${year}${month}${day}_${hours}${minutes}${seconds}.json`;
+            
+            const blob = new Blob([lastConvertedJson], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = outputName;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>

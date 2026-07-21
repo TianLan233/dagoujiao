@@ -1,0 +1,207 @@
+{
+  "AbsorptionAmount": 0.0,
+  "ArmorDropChances": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "ArmorItems": [
+    {
+      "id": "minecraft:netherite_boots",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_leggings",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_chestplate",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_helmet",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6
+          }
+        }
+      }
+    }
+  ],
+  "CustomName": "&#ED7014Dame MISSYOU_COPYsakurakoujiai",
+  "HandDropChances": [
+    2.0,
+    0.0
+  ],
+  "HandItems": [
+    {
+      "components": {
+        "apotheosis:affixes": {
+          "apotheosis:breaker/ability/enlightened": 0.4954677,
+          "apotheosis:breaker/attribute/destructive": 0.75489676,
+          "apotheosis:breaker/attribute/experienced": 0.2639913,
+          "apotheosis:breaker/attribute/lengthy": 0.49183986,
+          "apotheosis:breaker/effect/omnetic": 0.2610076,
+          "apotheosis:breaker/effect/radial": 0.5523398,
+          "大幸运值": 6.0
+        },
+        "apotheosis:durability_bonus": 0.65783966,
+        "apotheosis:from_boss": true,
+        "apotheosis:rarity": "apotheosis:mythic",
+        "apotheosis:sockets": 1,
+        "minecraft:custom_name": {
+          "extra": [
+            "Pick"
+          ],
+          "italic": false,
+          "text": "Hellborn "
+        },
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:efficiency": 4,
+            "minecraft:fortune": 8,
+            "minecraft:unbreaking": 3
+          }
+        }
+      },
+      "count": 1,
+      "id": "minecraft:netherite_pickaxe"
+    },
+    {
+      "id": "minecraft:shield",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "apothic_enchanting:reflective_defenses": 2,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    }
+  ],
+  "Health": 999992.75,
+  "UUID": [
+    -354411555,
+    806309759,
+    -1345882266,
+    -1348822070
+  ],
+  "active_effects": [
+    {
+      "ambient": true,
+      "duration": 3470,
+      "id": "minecraft:glowing",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    },
+    {
+      "duration": 52,
+      "id": "apothic_attributes:sundering",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": true
+    },
+    {
+      "amplifier": true,
+      "duration": 12,
+      "id": "minecraft:slowness",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": true
+    },
+    {
+      "ambient": true,
+      "amplifier": true,
+      "duration": 2147483517,
+      "id": "minecraft:fire_resistance",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    }
+  ],
+  "attributes": [
+    {
+      "base": 1.0,
+      "id": "apothic_attributes:mining_speed"
+    },
+    {
+      "id": "minecraft:generic.attack_damage",
+      "total_amount": 33578198881.2856
+    },
+    {
+      "id": "apothic_attributes:prot_shred",
+      "total_amount": 439.9521849818454
+    },
+    {
+      "id": "minecraft:generic.movement_speed",
+      "total_amount": 0.2977380035659519
+    },
+    {
+      "base": 1.0,
+      "id": "apothic_attributes:experience_gained"
+    },
+    {
+      "id": "minecraft:generic.armor",
+      "total_amount": 385857.1977852046
+    },
+    {
+      "id": "apothic_attributes:projectile_damage",
+      "total_amount": 4909093465.2977295
+    },
+    {
+      "id": "apothic_attributes:armor_shred",
+      "total_amount": 879.9043699636908
+    },
+    {
+      "id": "apothic_attributes:prot_pierce",
+      "total_amount": 20.0
+    },
+    {
+      "id": "minecraft:generic.armor_toughness",
+      "total_amount": 768.7452291872729
+    },
+    {
+      "id": "apothic_attributes:armor_pierce",
+      "total_amount": 25.0
+    },
+    {
+      "id": "minecraft:generic.max_health",
+      "total_amount": 486687523153.34406
+    }
+  ],
+  "id": "minecraft:wolf",
+  "variant": "minecraft:pale"
+}

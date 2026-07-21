@@ -1,0 +1,196 @@
+{
+  "AbsorptionAmount": 0.0,
+  "ArmorDropChances": [
+    0.0,
+    2.0,
+    0.0,
+    0.0
+  ],
+  "ArmorItems": [
+    {
+      "id": "minecraft:netherite_boots",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:fire_protection": 3,
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "components": {
+        "apotheosis:affixes": {
+          "apotheosis:armor/attribute/fortunate": 0.9079137,
+          "apotheosis:armor/attribute/spiritual": 0.86725134,
+          "韧性值": 6.0,
+          "魔法减伤": 0.12098837,
+          "抗性提升": 0.2524804,
+          "apotheosis:armor/mob_effect/revitalizing": 0.32240224,
+          "大幸运值": 5.25778269
+        },
+        "apotheosis:durability_bonus": 0.7144393,
+        "apotheosis:from_boss": true,
+        "apotheosis:rarity": "apotheosis:mythic",
+        "apotheosis:sockets": 2,
+        "minecraft:custom_name": {
+          "extra": [
+            "Tassets"
+          ],
+          "italic": false,
+          "text": "Hellborn "
+        },
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 7,
+            "minecraft:unbreaking": 4
+          }
+        }
+      },
+      "count": 1,
+      "id": "minecraft:netherite_leggings"
+    },
+    {
+      "id": "minecraft:netherite_chestplate",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:fire_protection": 3,
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_helmet",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6,
+            "minecraft:respiration": 3
+          }
+        }
+      }
+    }
+  ],
+  "CustomName": "&#ED7014world_execute0me",
+  "HandDropChances": [
+    0.0,
+    0.0
+  ],
+  "HandItems": [
+    {
+      "id": "minecraft:netherite_axe",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:efficiency": 4,
+            "minecraft:sharpness": 15
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:shield",
+      "components": {
+        "minecraft:enchantments": {}
+      }
+    }
+  ],
+  "Health": 999999.4,
+  "TicksFrozen": 140,
+  "UUID": [
+    1437231887,
+    732973097,
+    -1243324906,
+    -1019846056
+  ],
+  "active_effects": [
+    {
+      "ambient": true,
+      "duration": 3308,
+      "id": "minecraft:glowing",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    },
+    {
+      "ambient": true,
+      "amplifier": true,
+      "duration": 2147483355,
+      "id": "minecraft:fire_resistance",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    },
+    {
+      "duration": 3,
+      "id": "minecraft:resistance",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": true
+    },
+    {
+      "amplifier": 2,
+      "duration": 103,
+      "id": "twilightforest:frosted",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": true
+    }
+  ],
+  "attributes": [
+    {
+      "id": "minecraft:generic.attack_damage",
+      "total_amount": 34363654257.08411
+    },
+    {
+      "id": "apothic_attributes:prot_shred",
+      "total_amount": 439.9521849818454
+    },
+    {
+      "id": "minecraft:generic.movement_speed",
+      "total_amount": 0.26928001459479345
+    },
+    {
+      "id": "minecraft:generic.armor",
+      "total_amount": 385857.1977852046
+    },
+    {
+      "id": "apothic_attributes:projectile_damage",
+      "total_amount": 4909093465.2977295
+    },
+    {
+      "id": "apothic_attributes:armor_shred",
+      "total_amount": 879.9043699636908
+    },
+    {
+      "id": "apothic_attributes:prot_pierce",
+      "total_amount": 20.0
+    },
+    {
+      "id": "minecraft:generic.armor_toughness",
+      "total_amount": 768.7452291872729
+    },
+    {
+      "id": "apothic_attributes:armor_pierce",
+      "total_amount": 25.0
+    },
+    {
+      "id": "minecraft:generic.max_health",
+      "total_amount": 652025792562.708
+    }
+  ],
+  "id": "minecraft:wolf",
+  "variant": "minecraft:pale"
+}

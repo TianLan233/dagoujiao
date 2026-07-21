@@ -1,0 +1,176 @@
+{
+  "AbsorptionAmount": 0.0,
+  "ArmorDropChances": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "ArmorItems": [
+    {
+      "id": "minecraft:netherite_boots",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_leggings",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_chestplate",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6,
+            "minecraft:thorns": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_helmet",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    }
+  ],
+  "CustomName": "&#ED7014Dame Mi_Side the nier_0xFF",
+  "HandDropChances": [
+    0.0,
+    2.0
+  ],
+  "HandItems": [
+    {
+      "id": "minecraft:netherite_pickaxe",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:efficiency": 4,
+            "minecraft:fortune": 15,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    },
+    {
+      "components": {
+        "apotheosis:affixes": {
+          "大幸运值": 5.018013,
+          "apotheosis:shield/attribute/ironforged": 0.9553106,
+          "apotheosis:shield/attribute/stalwart": 1.0,
+          "apotheosis:shield/attribute/steel_touched": 1.0,
+          "apotheosis:shield/mob_effect/galvanizing": 0.85347205,
+          "apotheosis:shield/mob_effect/venomous": 0.65844154,
+          "apotheosis:shield/psychic": 0.5856229
+        },
+        "apotheosis:durability_bonus": 0.7195009,
+        "apotheosis:from_boss": true,
+        "apotheosis:rarity": "apotheosis:mythic",
+        "apotheosis:sockets": 2,
+        "minecraft:custom_name": {
+          "italic": false,
+          "translate": "item.minecraft.shield"
+        },
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:unbreaking": 4
+          }
+        }
+      },
+      "count": 1,
+      "id": "minecraft:shield"
+    }
+  ],
+  "Health": 999991.0,
+  "UUID": [
+    1869512733,
+    -1964554261,
+    -2024176241,
+    1735374957
+  ],
+  "active_effects": [
+    {
+      "ambient": true,
+      "duration": 2740,
+      "id": "minecraft:glowing",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    },
+    {
+      "ambient": true,
+      "amplifier": true,
+      "duration": 2147482787,
+      "id": "minecraft:fire_resistance",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    }
+  ],
+  "attributes": [
+    {
+      "id": "minecraft:generic.attack_damage",
+      "total_amount": 41236383235.83038
+    },
+    {
+      "id": "apothic_attributes:prot_shred",
+      "total_amount": 439.9521849818454
+    },
+    {
+      "id": "minecraft:generic.movement_speed",
+      "total_amount": 0.4528800145143269
+    },
+    {
+      "id": "minecraft:generic.armor",
+      "total_amount": 385857.1977852046
+    },
+    {
+      "id": "apothic_attributes:projectile_damage",
+      "total_amount": 4909093465.2977295
+    },
+    {
+      "id": "apothic_attributes:armor_shred",
+      "total_amount": 879.9043699636908
+    },
+    {
+      "id": "apothic_attributes:prot_pierce",
+      "total_amount": 20.0
+    },
+    {
+      "id": "minecraft:generic.armor_toughness",
+      "total_amount": 768.7452291872729
+    },
+    {
+      "id": "apothic_attributes:armor_pierce",
+      "total_amount": 25.0
+    },
+    {
+      "id": "minecraft:generic.max_health",
+      "total_amount": 578242123771.8289
+    }
+  ],
+  "id": "minecraft:wolf",
+  "variant": "minecraft:pale"
+}

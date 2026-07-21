@@ -1,0 +1,183 @@
+{
+  "AbsorptionAmount": 0.0,
+  "ArmorDropChances": [
+    0.0,
+    0.0,
+    0.0,
+    2.0
+  ],
+  "ArmorItems": [
+    {
+      "id": "minecraft:netherite_boots",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:feather_falling": 4,
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_leggings",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:protection": 6,
+            "minecraft:unbreaking": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:netherite_chestplate",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:fire_protection": 3,
+            "minecraft:protection": 6
+          }
+        }
+      }
+    },
+    {
+      "components": {
+        "apotheosis:affixes": {
+          "生命值": 7.0251995,
+          "apotheosis:armor/attribute/fireproof": 0.30904844,
+          "击退抗性": 0.35,
+          "韧性值": 4.7961864,
+          "弹射物减伤": 0.29006319,
+          "apotheosis:armor/dmg_reduction/grounded": 0.77920717,
+          "魔法减伤": 0.10953939
+        },
+        "apotheosis:durability_bonus": 0.5699753,
+        "apotheosis:from_boss": true,
+        "apotheosis:rarity": "apotheosis:mythic",
+        "apotheosis:sockets": 1,
+        "minecraft:custom_name": {
+          "extra": [
+            "Crown"
+          ],
+          "italic": false,
+          "text": "Burnt "
+        },
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:blast_protection": 4,
+            "minecraft:protection": 7
+          }
+        }
+      },
+      "count": 1,
+      "id": "minecraft:netherite_helmet"
+    }
+  ],
+  "CustomName": "&#ED7014Lacera_Valentine",
+  "HandDropChances": [
+    0.0,
+    0.0
+  ],
+  "HandItems": [
+    {
+      "id": "minecraft:netherite_shovel",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "minecraft:fortune": 15
+          }
+        }
+      }
+    },
+    {
+      "id": "minecraft:shield",
+      "components": {
+        "minecraft:enchantments": {
+          "levels": {
+            "apothic_enchanting:reflective_defenses": 2
+          }
+        }
+      }
+    }
+  ],
+  "Health": 1000000.0,
+  "UUID": [
+    140827390,
+    -1212267617,
+    -1484939469,
+    506785379
+  ],
+  "active_effects": [
+    {
+      "ambient": true,
+      "duration": 3428,
+      "id": "minecraft:glowing",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    },
+    {
+      "ambient": true,
+      "amplifier": true,
+      "duration": 2147483475,
+      "id": "minecraft:fire_resistance",
+      "neoforge:cures": [
+        "protected_by_totem",
+        "milk"
+      ],
+      "show_icon": false,
+      "show_particles": false
+    }
+  ],
+  "attributes": [
+    {
+      "base": 0.0,
+      "id": "minecraft:generic.explosion_knockback_resistance"
+    },
+    {
+      "id": "minecraft:generic.attack_damage",
+      "total_amount": 37898200522.12968
+    },
+    {
+      "id": "apothic_attributes:prot_shred",
+      "total_amount": 439.9521849818454
+    },
+    {
+      "id": "minecraft:generic.movement_speed",
+      "total_amount": 0.4681800096438822
+    },
+    {
+      "id": "minecraft:generic.armor",
+      "total_amount": 385857.1977852046
+    },
+    {
+      "id": "apothic_attributes:projectile_damage",
+      "total_amount": 4909093465.2977295
+    },
+    {
+      "id": "apothic_attributes:armor_shred",
+      "total_amount": 879.9043699636908
+    },
+    {
+      "id": "apothic_attributes:prot_pierce",
+      "total_amount": 20.0
+    },
+    {
+      "id": "minecraft:generic.armor_toughness",
+      "total_amount": 768.7452291872729
+    },
+    {
+      "id": "apothic_attributes:armor_pierce",
+      "total_amount": 25.0
+    },
+    {
+      "id": "minecraft:generic.max_health",
+      "total_amount": 565478488252.7369
+    }
+  ],
+  "id": "minecraft:wolf",
+  "variant": "minecraft:pale"
+}

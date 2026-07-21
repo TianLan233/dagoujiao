@@ -30,8 +30,9 @@ desktop.ini
 *副本*
 * - 副本*
 
-# Output files (optional, uncomment if needed)
+# Resource files (optional, uncomment if needed)
 input/
 output/
-# *.json
-# *.csv
+*.json
+*.csv
+*.txt

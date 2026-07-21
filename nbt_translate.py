@@ -51,6 +51,9 @@ KEY_TRANSLATION = {
     "apotheosis:melee/mob_effect/bloodletting":"放血",
     "apotheosis:melee/mob_effect/festive":"节庆",
     "apotheosis:melee/mob_effect/elusive":"灵巧",
+    "apotheosis:shield/attribute/ironforged":"护甲百分比",
+    "apotheosis:shield/attribute/stelltouched":"韧性百分比",
+    "apotheosis:shield/attribute/stalwart":"击退抗性",
 }
 
 #数值区间列表：定义属性的数值区间[最小值,最大值]，修正值0.0对应最小值，修正值1.0对应最大值
@@ -80,6 +83,9 @@ VALUE_RANGES = {
     "apotheosis:melee/executing":[0.15,0.25],
     "apotheosis:melee/thunderstruck":[4,8],
     "apotheosis:melee/mob_effect/festive":[0.03,0.06],
+    "apotheosis:shield/attribute/ironforged":[0.2,0.3],
+    "apotheosis:shield/attribute/stelltouched":[0.2,0.3],
+    "apotheosis:shield/attribute/stalwart":[0.25,0.35],
 }
 
 #删除键名列表：在导出前删除这些键名及其对应键值
@@ -119,8 +125,15 @@ REMOVE_KEYS = [
     "twilightforest:slimy_soles_bounce_info",
     "yes_steve_model:vehicle_model_id",
     "apotheosis:affix_name",
-    "attributes",
+    #"attributes",
     "minecraft:custom_name",
+    "apotheosis:durability_bonus",
+    "apotheosis:from_boss",
+    "apotheosis:rarity",
+    "count",
+    "minecraft:enchantments",
+    "ArmorDropChances",
+    "HandDropChances",
 ]
 
 class NBTToJSONConverter:
@@ -718,6 +731,62 @@ def detect_armor_set(data):
     return ""
 
 
+def sum_armor_enchantments(data):
+    """提取ArmorItems下所有项目的enchantments，将相同键名的键值相加"""
+    enchantment_sum = {}
+    
+    if isinstance(data, dict) and 'ArmorItems' in data:
+        armor_items = data['ArmorItems']
+        if isinstance(armor_items, list):
+            for item in armor_items:
+                if isinstance(item, dict) and 'components' in item:
+                    components = item['components']
+                    if isinstance(components, dict) and 'minecraft:enchantments' in components:
+                        enchantments = components['minecraft:enchantments']
+                        if isinstance(enchantments, dict):
+                            # 检查是否有levels嵌套结构
+                            if 'levels' in enchantments and isinstance(enchantments['levels'], dict):
+                                enchant_levels = enchantments['levels']
+                            else:
+                                enchant_levels = enchantments
+                            
+                            # 遍历所有附魔键值对
+                            for enchant_name, enchant_level in enchant_levels.items():
+                                # 如果值是字典，尝试获取其数值
+                                if isinstance(enchant_level, dict):
+                                    # 如果是嵌套字典，尝试获取第一个数值
+                                    continue
+                                elif isinstance(enchant_level, (int, float)):
+                                    if enchant_name in enchantment_sum:
+                                        enchantment_sum[enchant_name] += enchant_level
+                                    else:
+                                        enchantment_sum[enchant_name] = enchant_level
+    
+    return enchantment_sum
+
+
+def remove_armor_items_details(data):
+    """删除ArmorItems中每个项目的详细信息，仅保留id（保留filter_drop_items过滤出的完整内容）"""
+    if isinstance(data, dict) and 'ArmorItems' in data:
+        armor_items = data['ArmorItems']
+        if isinstance(armor_items, list):
+            simplified_items = []
+            for item in armor_items:
+                if isinstance(item, dict) and 'id' in item:
+                    # 检查是否只有id和components两个键（即filter_drop_items简化后的结构）
+                    if set(item.keys()) == {'id', 'components'}:
+                        # 这是被filter_drop_items简化过的（掉落概率==0），简化为仅保留id
+                        simplified_items.append({'id': item['id']})
+                    else:
+                        # 这是filter_drop_items保留的完整内容（掉落概率!=0），保留原样
+                        simplified_items.append(item)
+                else:
+                    simplified_items.append(item)
+            data['ArmorItems'] = simplified_items
+    
+    return data
+
+
 def convert_single_file(input_file, output_file, exclude_ids=None):
     """将单个NBT文件转换为JSON文件"""
     if exclude_ids is None:
@@ -764,11 +833,21 @@ def convert_single_file(input_file, output_file, exclude_ids=None):
     #检测装备套装并添加描述
     armor_desc = detect_armor_set(data)
     
+    #计算附魔总和
+    enchantment_sum = sum_armor_enchantments(data)
+    
+    #删除ArmorItems详细信息
+    data = remove_armor_items_details(data)
+    
     #写入JSON文件
     with open(output_file, 'w', encoding='utf-8') as f:
-        if armor_desc:
+        if armor_desc or enchantment_sum:
             # 在JSON数据中添加描述字段
-            output_data = {"_描述": armor_desc}
+            output_data = {}
+            if armor_desc:
+                output_data["_描述"] = armor_desc
+            if enchantment_sum:
+                output_data["_附魔总和"] = enchantment_sum
             if isinstance(data, dict):
                 output_data.update(data)
             else:

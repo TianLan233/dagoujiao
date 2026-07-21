@@ -88,6 +88,27 @@ VALUE_RANGES = {
     "apotheosis:shield/attribute/stalwart":[0.25,0.35],
 }
 
+#物品ID翻译表：将物品ID翻译为中文名称
+ITEM_ID_TRANSLATION = {
+    #在这里添加需要翻译的物品ID
+    "minecraft:netherite_axe": "下界合金斧",
+    "minecraft:netherite_sword": "下界合金剑",
+    "minecraft:netherite_pickaxe": "下界合金镐",
+    "minecraft:netherite_shovel": "下界合金锹",
+    "minecraft:netherite_hoe": "下界合金锄",
+    "minecraft:diamond_axe": "钻石斧",
+    "minecraft:diamond_sword": "钻石剑",
+    "minecraft:diamond_pickaxe": "钻石镐",
+    "minecraft:diamond_shovel": "钻石锹",
+    "minecraft:iron_axe": "铁斧",
+    "minecraft:iron_sword": "铁剑",
+    "minecraft:shield": "盾牌",
+    "twilightforest:glass_sword": "玻璃刀",
+    "twilightforest:knightmetal_shield": "骑士金属盾",
+    "twilightforest:ironwood_sword": "铁木剑",
+    "twilightforest:fiery_sword": "火焰剑",
+}
+
 #删除键名列表：在导出前删除这些键名及其对应键值
 REMOVE_KEYS = [
     #在这里添加需要删除的键名
@@ -458,7 +479,7 @@ def apply_value_ranges(data, value_ranges, in_affixes=False):
                     min_val, max_val = value_ranges[key]
                     #线性插值计算实际值
                     actual_value = min_val + (max_val - min_val) * value
-                    result[key] = actual_value
+                    result[key] = round(actual_value, 2)
                 else:
                     result[key] = apply_value_ranges(value, value_ranges, in_affixes)
             return result
@@ -714,6 +735,26 @@ def filter_excluded_ids(data, exclude_ids):
         return data
 
 
+def detect_hand_items(data, translation_table=None):
+    """检测HandItems中的物品ID，返回翻译后的物品描述列表"""
+    if translation_table is None:
+        translation_table = ITEM_ID_TRANSLATION
+    
+    hand_items_desc = []
+    
+    if isinstance(data, dict) and 'HandItems' in data:
+        hand_items = data['HandItems']
+        if isinstance(hand_items, list):
+            for item in hand_items:
+                if isinstance(item, dict) and 'id' in item:
+                    item_id = item['id']
+                    # 使用翻译表翻译物品ID
+                    translated_name = translation_table.get(item_id, item_id)
+                    hand_items_desc.append(translated_name)
+    
+    return hand_items_desc
+
+
 def detect_armor_set(data):
     """检测ArmorItems第一项的id，返回对应的装备套装描述"""
     if isinstance(data, dict) and 'ArmorItems' in data:
@@ -732,13 +773,42 @@ def detect_armor_set(data):
 
 
 def sum_armor_enchantments(data):
-    """提取ArmorItems下所有项目的enchantments，将相同键名的键值相加"""
+    """提取ArmorItems和HandItems下所有项目的enchantments，将相同键名的键值相加"""
     enchantment_sum = {}
     
+    # 处理ArmorItems
     if isinstance(data, dict) and 'ArmorItems' in data:
         armor_items = data['ArmorItems']
         if isinstance(armor_items, list):
             for item in armor_items:
+                if isinstance(item, dict) and 'components' in item:
+                    components = item['components']
+                    if isinstance(components, dict) and 'minecraft:enchantments' in components:
+                        enchantments = components['minecraft:enchantments']
+                        if isinstance(enchantments, dict):
+                            # 检查是否有levels嵌套结构
+                            if 'levels' in enchantments and isinstance(enchantments['levels'], dict):
+                                enchant_levels = enchantments['levels']
+                            else:
+                                enchant_levels = enchantments
+                            
+                            # 遍历所有附魔键值对
+                            for enchant_name, enchant_level in enchant_levels.items():
+                                # 如果值是字典，尝试获取其数值
+                                if isinstance(enchant_level, dict):
+                                    # 如果是嵌套字典，尝试获取第一个数值
+                                    continue
+                                elif isinstance(enchant_level, (int, float)):
+                                    if enchant_name in enchantment_sum:
+                                        enchantment_sum[enchant_name] += enchant_level
+                                    else:
+                                        enchantment_sum[enchant_name] = enchant_level
+    
+    # 处理HandItems
+    if isinstance(data, dict) and 'HandItems' in data:
+        hand_items = data['HandItems']
+        if isinstance(hand_items, list):
+            for item in hand_items:
                 if isinstance(item, dict) and 'components' in item:
                     components = item['components']
                     if isinstance(components, dict) and 'minecraft:enchantments' in components:
@@ -773,12 +843,19 @@ def remove_armor_items_details(data):
             simplified_items = []
             for item in armor_items:
                 if isinstance(item, dict) and 'id' in item:
-                    # 检查是否只有id和components两个键（即filter_drop_items简化后的结构）
-                    if set(item.keys()) == {'id', 'components'}:
-                        # 这是被filter_drop_items简化过的（掉落概率==0），简化为仅保留id
-                        simplified_items.append({'id': item['id']})
+                    # 检查components是否为空（即filter_drop_items简化后的结构）
+                    if 'components' in item and isinstance(item['components'], dict):
+                        if len(item['components']) == 0:
+                            # components为空，说明是掉落概率==0的简化项，仅保留id
+                            simplified_items.append({'id': item['id']})
+                        else:
+                            # components有内容，说明是掉落概率!=0的完整项，保留原样
+                            simplified_items.append(item)
+                    elif set(item.keys()) == {'id'}:
+                        # 只有id键，直接保留
+                        simplified_items.append(item)
                     else:
-                        # 这是filter_drop_items保留的完整内容（掉落概率!=0），保留原样
+                        # 有其他键但不是components结构，保留原样
                         simplified_items.append(item)
                 else:
                     simplified_items.append(item)
@@ -823,6 +900,12 @@ def convert_single_file(input_file, output_file, exclude_ids=None):
     if KEY_TRANSLATION:
         data = translate_keys(data, KEY_TRANSLATION)
     
+    #计算附魔总和（在删除enchantments键之前）
+    enchantment_sum = sum_armor_enchantments(data)
+    
+    #删除ArmorItems详细信息（在删除键名之前，以便区分完整和简化物品）
+    data = remove_armor_items_details(data)
+    
     #删除指定键名
     if REMOVE_KEYS:
         data = remove_keys(data, REMOVE_KEYS)
@@ -833,19 +916,18 @@ def convert_single_file(input_file, output_file, exclude_ids=None):
     #检测装备套装并添加描述
     armor_desc = detect_armor_set(data)
     
-    #计算附魔总和
-    enchantment_sum = sum_armor_enchantments(data)
-    
-    #删除ArmorItems详细信息
-    data = remove_armor_items_details(data)
+    #检测HandItems并添加描述
+    hand_items_desc = detect_hand_items(data)
     
     #写入JSON文件
     with open(output_file, 'w', encoding='utf-8') as f:
-        if armor_desc or enchantment_sum:
+        if armor_desc or hand_items_desc or enchantment_sum:
             # 在JSON数据中添加描述字段
             output_data = {}
             if armor_desc:
-                output_data["_描述"] = armor_desc
+                output_data["_套装"] = armor_desc
+            if hand_items_desc:
+                output_data["_手持物品"] = hand_items_desc
             if enchantment_sum:
                 output_data["_附魔总和"] = enchantment_sum
             if isinstance(data, dict):

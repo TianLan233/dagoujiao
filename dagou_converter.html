@@ -401,6 +401,25 @@
             "apotheosis:melee/mob_effect/festive":[0.03,0.06],
         };
 
+        const ITEM_ID_TRANSLATION = {
+            "minecraft:netherite_axe": "下界合金斧",
+            "minecraft:netherite_sword": "下界合金剑",
+            "minecraft:netherite_pickaxe": "下界合金镐",
+            "minecraft:netherite_shovel": "下界合金锹",
+            "minecraft:netherite_hoe": "下界合金锄",
+            "minecraft:diamond_axe": "钻石斧",
+            "minecraft:diamond_sword": "钻石剑",
+            "minecraft:diamond_pickaxe": "钻石镐",
+            "minecraft:diamond_shovel": "钻石锹",
+            "minecraft:iron_axe": "铁斧",
+            "minecraft:iron_sword": "铁剑",
+            "minecraft:shield": "盾牌",
+            "twilightforest:glass_sword": "玻璃刀",
+            "twilightforest:knightmetal_shield": "骑士金属盾",
+            "twilightforest:ironwood_sword": "铁木剑",
+            "twilightforest:fiery_sword": "火焰剑",
+        };
+
         const REMOVE_KEYS = [
             "Age",
             "Air",
@@ -856,6 +875,23 @@
             return data;
         }
 
+        function detectHandItems(data, translationTable = ITEM_ID_TRANSLATION) {
+            const handItemsDesc = [];
+            if (typeof data === 'object' && data !== null && 'HandItems' in data) {
+                const handItems = data.HandItems;
+                if (Array.isArray(handItems)) {
+                    for (const item of handItems) {
+                        if (typeof item === 'object' && item !== null && 'id' in item) {
+                            const itemId = item.id;
+                            const translatedName = translationTable[itemId] || itemId;
+                            handItemsDesc.push(translatedName);
+                        }
+                    }
+                }
+            }
+            return handItemsDesc;
+        }
+
         function convertNBTToJSON(inputText) {
             const converter = new NBTToJSONConverter();
             const nbtText = converter.extractEntityData(inputText);
@@ -869,6 +905,13 @@
             data = translateKeys(data, KEY_TRANSLATION);
             data = removeKeys(data, REMOVE_KEYS);
             data = formatCustomName(data);
+            
+            //检测HandItems并添加到描述
+            const handItemsDesc = detectHandItems(data);
+            if (handItemsDesc.length > 0) {
+                data._手持物品 = handItemsDesc;
+            }
+            
             return data;
         }
 

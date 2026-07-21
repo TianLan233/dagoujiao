@@ -54,6 +54,15 @@ KEY_TRANSLATION = {
     "apotheosis:shield/attribute/ironforged":"护甲百分比",
     "apotheosis:shield/attribute/stelltouched":"韧性百分比",
     "apotheosis:shield/attribute/stalwart":"击退抗性",
+    "minecraft:protection":"保护",
+    "minecraft:fire_protection":"火焰保护",
+    "minecraft:blast_protection":"爆炸保护",
+    "minecraft:projectile_protection":"弹射物保护",
+    "minecraft:feather_falling":"摔落保护",
+    "minecraft:depth_strider":"深海探索者",
+    "minecraft:thorns":"荆棘",
+    "minecraft:fortune":"时运",
+    "minecraft:sharpness":"锋利",
 }
 
 #数值区间列表：定义属性的数值区间[最小值,最大值]，修正值0.0对应最小值，修正值1.0对应最大值
@@ -864,6 +873,46 @@ def remove_armor_items_details(data):
     return data
 
 
+def remove_empty_keys(data):
+    """递归删除空的键值（空字典、空列表、空字符串等）"""
+    if isinstance(data, dict):
+        result = {}
+        for key, value in data.items():
+            cleaned_value = remove_empty_keys(value)
+            # 检查值是否为空
+            if isinstance(cleaned_value, dict) and len(cleaned_value) == 0:
+                continue  # 跳过空字典
+            elif isinstance(cleaned_value, list) and len(cleaned_value) == 0:
+                continue  # 跳过空列表
+            elif isinstance(cleaned_value, str) and cleaned_value == "":
+                continue  # 跳过空字符串
+            elif cleaned_value is None:
+                continue  # 跳过None值
+            else:
+                result[key] = cleaned_value
+        return result
+    
+    elif isinstance(data, list):
+        cleaned_list = []
+        for item in data:
+            cleaned_item = remove_empty_keys(item)
+            # 检查值是否为空
+            if isinstance(cleaned_item, dict) and len(cleaned_item) == 0:
+                continue  # 跳过空字典
+            elif isinstance(cleaned_item, list) and len(cleaned_item) == 0:
+                continue  # 跳过空列表
+            elif isinstance(cleaned_item, str) and cleaned_item == "":
+                continue  # 跳过空字符串
+            elif cleaned_item is None:
+                continue  # 跳过None值
+            else:
+                cleaned_list.append(cleaned_item)
+        return cleaned_list
+    
+    else:
+        return data
+
+
 def convert_single_file(input_file, output_file, exclude_ids=None):
     """将单个NBT文件转换为JSON文件"""
     if exclude_ids is None:
@@ -903,21 +952,24 @@ def convert_single_file(input_file, output_file, exclude_ids=None):
     #计算附魔总和（在删除enchantments键之前）
     enchantment_sum = sum_armor_enchantments(data)
     
+    #检测装备套装并添加描述（在删除ArmorItems详细信息之前）
+    armor_desc = detect_armor_set(data)
+    
+    #检测HandItems并添加描述（在删除键名之前）
+    hand_items_desc = detect_hand_items(data)
+    
+    #格式化CustomName（在删除键名之前）
+    data = format_custom_name(data)
+    
     #删除ArmorItems详细信息（在删除键名之前，以便区分完整和简化物品）
     data = remove_armor_items_details(data)
     
-    #删除指定键名
+    #删除指定键名（最后执行，确保所有关键步骤已完成）
     if REMOVE_KEYS:
         data = remove_keys(data, REMOVE_KEYS)
     
-    #格式化CustomName
-    data = format_custom_name(data)
-    
-    #检测装备套装并添加描述
-    armor_desc = detect_armor_set(data)
-    
-    #检测HandItems并添加描述
-    hand_items_desc = detect_hand_items(data)
+    #删除空的键值（最后执行，清理空字典、空列表、空字符串等）
+    data = remove_empty_keys(data)
     
     #写入JSON文件
     with open(output_file, 'w', encoding='utf-8') as f:

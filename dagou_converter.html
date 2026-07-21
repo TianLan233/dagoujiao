@@ -273,7 +273,7 @@
 <body>
     <div class="container">
         <h1>大狗 to JSON 转换器</h1>
-        <p class="subtitle">上传 .txt 文件或粘贴文本，自动转换为格式化的 JSON (安装tweakerge后f3+I复制物品数据)</p>
+        <p class="subtitle">上传 .txt 文件或粘贴文本，自动转换为格式化的 JSON (支持 data= 或 mob_imprisonment= 格式)</p>
         
         <div class="main-container">
             <div class="left-panel">
@@ -372,6 +372,18 @@
             "apotheosis:melee/mob_effect/bloodletting":"放血",
             "apotheosis:melee/mob_effect/festive":"节庆",
             "apotheosis:melee/mob_effect/elusive":"灵巧",
+            "apotheosis:shield/attribute/ironforged":"护甲百分比",
+            "apotheosis:shield/attribute/stelltouched":"韧性百分比",
+            "apotheosis:shield/attribute/stalwart":"击退抗性",
+            "minecraft:protection":"保护",
+            "minecraft:fire_protection":"火焰保护",
+            "minecraft:blast_protection":"爆炸保护",
+            "minecraft:projectile_protection":"弹射物保护",
+            "minecraft:feather_falling":"摔落保护",
+            "minecraft:depth_strider":"深海探索者",
+            "minecraft:thorns":"荆棘",
+            "minecraft:fortune":"时运",
+            "minecraft:sharpness":"锋利",
         };
 
         const VALUE_RANGES = {
@@ -399,6 +411,9 @@
             "apotheosis:melee/executing":[0.15,0.25],
             "apotheosis:melee/thunderstruck":[4,8],
             "apotheosis:melee/mob_effect/festive":[0.03,0.06],
+            "apotheosis:shield/attribute/ironforged":[0.2,0.3],
+            "apotheosis:shield/attribute/stelltouched":[0.2,0.3],
+            "apotheosis:shield/attribute/stalwart":[0.25,0.35],
         };
 
         const ITEM_ID_TRANSLATION = {
@@ -455,6 +470,14 @@
             "twilightforest:slimy_soles_bounce_info",
             "yes_steve_model:vehicle_model_id",
             "apotheosis:affix_name",
+            "minecraft:custom_name",
+            "apotheosis:durability_bonus",
+            "apotheosis:from_boss",
+            "apotheosis:rarity",
+            "count",
+            "minecraft:enchantments",
+            "ArmorDropChances",
+            "HandDropChances",
         ];
 
         //NBT解析器
@@ -465,8 +488,8 @@
             }
 
             extractEntityData(inputText) {
-                const match = inputText.match(/entity_data=\{/);
-                if (!match) throw new Error("未找到entity_data=标记");
+                const match = inputText.match(/(?:data|mob_imprisonment)=\{/);
+                if (!match) throw new Error("未找到data=或mob_imprisonment=标记");
                 
                 let braceCount = 0;
                 let inString = false;
@@ -764,8 +787,7 @@
                 if (Array.isArray(data)) {
                     return data.map(item => filterExcludedIds(item, excludeIds)).filter(item => item !== null);
                 }
-                //只过滤attributes数组中的属性对象
-                if ('id' in data && 'total_amount' in data && excludeIds.includes(data.id)) return null;
+                if ('id' in data && excludeIds.includes(data.id)) return null;
                 const result = {};
                 for (const [key, value] of Object.entries(data)) {
                     const filtered = filterExcludedIds(value, excludeIds);
@@ -795,7 +817,8 @@
                     for (const [key, value] of Object.entries(data)) {
                         if (key in valueRanges && (typeof value === 'number')) {
                             const [minVal, maxVal] = valueRanges[key];
-                            result[key] = minVal + (maxVal - minVal) * value;
+                            const actualValue = minVal + (maxVal - minVal) * value;
+                            result[key] = Math.round(actualValue * 100) / 100;
                         } else {
                             result[key] = applyValueRanges(value, valueRanges, inAffixes);
                         }
@@ -875,6 +898,103 @@
             return data;
         }
 
+        function detectArmorSet(data) {
+            if (typeof data === 'object' && data !== null && 'ArmorItems' in data) {
+                const armorItems = data.ArmorItems;
+                if (Array.isArray(armorItems) && armorItems.length > 0) {
+                    const firstItem = armorItems[0];
+                    if (typeof firstItem === 'object' && firstItem !== null && 'id' in firstItem) {
+                        const armorId = firstItem.id;
+                        const armorMap = {
+                            "minecraft:netherite_boots": "下界合金套",
+                            "twilightforest:yeti_boots": "雪怪套",
+                        };
+                        return armorMap[armorId] || "";
+                    }
+                }
+            }
+            return "";
+        }
+
+        function sumArmorEnchantments(data) {
+            const enchantmentSum = {};
+            
+            function processEnchantments(enchantments) {
+                if (typeof enchantments !== 'object' || enchantments === null) return;
+                const enchantLevels = ('levels' in enchantments && typeof enchantments.levels === 'object') ? enchantments.levels : enchantments;
+                for (const [enchantName, enchantLevel] of Object.entries(enchantLevels)) {
+                    if (typeof enchantLevel === 'number') {
+                        enchantmentSum[enchantName] = (enchantmentSum[enchantName] || 0) + enchantLevel;
+                    }
+                }
+            }
+            
+            if (typeof data === 'object' && data !== null && 'ArmorItems' in data && Array.isArray(data.ArmorItems)) {
+                for (const item of data.ArmorItems) {
+                    if (typeof item === 'object' && item !== null && 'components' in item && typeof item.components === 'object' && 'minecraft:enchantments' in item.components) {
+                        processEnchantments(item.components['minecraft:enchantments']);
+                    }
+                }
+            }
+            
+            if (typeof data === 'object' && data !== null && 'HandItems' in data && Array.isArray(data.HandItems)) {
+                for (const item of data.HandItems) {
+                    if (typeof item === 'object' && item !== null && 'components' in item && typeof item.components === 'object' && 'minecraft:enchantments' in item.components) {
+                        processEnchantments(item.components['minecraft:enchantments']);
+                    }
+                }
+            }
+            
+            return enchantmentSum;
+        }
+
+        function removeArmorItemsDetails(data) {
+            if (typeof data === 'object' && data !== null && 'ArmorItems' in data && Array.isArray(data.ArmorItems)) {
+                data.ArmorItems = data.ArmorItems.map(item => {
+                    if (typeof item === 'object' && item !== null && 'id' in item) {
+                        if ('components' in item && typeof item.components === 'object') {
+                            if (Object.keys(item.components).length === 0) {
+                                return { id: item.id };
+                            }
+                        } else if (Object.keys(item).length === 1 && 'id' in item) {
+                            return item;
+                        }
+                    }
+                    return item;
+                });
+            }
+            return data;
+        }
+
+        function removeEmptyKeys(data) {
+            if (typeof data === 'object' && data !== null) {
+                if (Array.isArray(data)) {
+                    const cleanedList = [];
+                    for (const item of data) {
+                        const cleanedItem = removeEmptyKeys(item);
+                        if (typeof cleanedItem === 'object' && cleanedItem !== null && Object.keys(cleanedItem).length === 0) continue;
+                        if (Array.isArray(cleanedItem) && cleanedItem.length === 0) continue;
+                        if (typeof cleanedItem === 'string' && cleanedItem === '') continue;
+                        if (cleanedItem === null) continue;
+                        cleanedList.push(cleanedItem);
+                    }
+                    return cleanedList;
+                }
+                
+                const result = {};
+                for (const [key, value] of Object.entries(data)) {
+                    const cleanedValue = removeEmptyKeys(value);
+                    if (typeof cleanedValue === 'object' && cleanedValue !== null && Object.keys(cleanedValue).length === 0) continue;
+                    if (Array.isArray(cleanedValue) && cleanedValue.length === 0) continue;
+                    if (typeof cleanedValue === 'string' && cleanedValue === '') continue;
+                    if (cleanedValue === null) continue;
+                    result[key] = cleanedValue;
+                }
+                return result;
+            }
+            return data;
+        }
+
         function detectHandItems(data, translationTable = ITEM_ID_TRANSLATION) {
             const handItemsDesc = [];
             if (typeof data === 'object' && data !== null && 'HandItems' in data) {
@@ -896,20 +1016,35 @@
             const converter = new NBTToJSONConverter();
             const nbtText = converter.extractEntityData(inputText);
             let data = converter.parseNBT(nbtText);
+            
             data = calculateAttributeModifiers(data);
             data = filterDropItems(data);
             data = filterExcludedIds(data, EXCLUDE_IDS);
-            //确保根对象不会被过滤为null
             if (data === null) data = {};
+            
             data = applyValueRanges(data, VALUE_RANGES);
             data = translateKeys(data, KEY_TRANSLATION);
-            data = removeKeys(data, REMOVE_KEYS);
-            data = formatCustomName(data);
             
-            //检测HandItems并添加到描述
+            const enchantmentSum = sumArmorEnchantments(data);
+            const armorDesc = detectArmorSet(data);
             const handItemsDesc = detectHandItems(data);
-            if (handItemsDesc.length > 0) {
-                data._手持物品 = handItemsDesc;
+            
+            data = formatCustomName(data);
+            data = removeArmorItemsDetails(data);
+            data = removeKeys(data, REMOVE_KEYS);
+            data = removeEmptyKeys(data);
+            
+            if (armorDesc || handItemsDesc.length > 0 || Object.keys(enchantmentSum).length > 0) {
+                const outputData = {};
+                if (armorDesc) outputData["_套装"] = armorDesc;
+                if (handItemsDesc.length > 0) outputData["_手持物品"] = handItemsDesc;
+                if (Object.keys(enchantmentSum).length > 0) outputData["_附魔总和"] = enchantmentSum;
+                if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+                    Object.assign(outputData, data);
+                } else {
+                    outputData["_数据"] = data;
+                }
+                return outputData;
             }
             
             return data;
@@ -1034,21 +1169,7 @@
             }
             
             try {
-                const converter = new NBTToJSONConverter();
-                const nbtText = converter.extractEntityData(text);
-                
-                let data = converter.parseNBT(nbtText);
-                data = calculateAttributeModifiers(data);
-                data = filterDropItems(data);
-                data = filterExcludedIds(data, EXCLUDE_IDS);
-                
-                if (data === null) data = {};
-                
-                data = applyValueRanges(data, VALUE_RANGES);
-                data = translateKeys(data, KEY_TRANSLATION);
-                data = removeKeys(data, REMOVE_KEYS);
-                data = formatCustomName(data);
-                
+                const data = convertNBTToJSON(text);
                 lastConvertedJson = JSON.stringify(data, null, 2);
                 textOutput.value = lastConvertedJson;
                 saveBtn.disabled = false;
